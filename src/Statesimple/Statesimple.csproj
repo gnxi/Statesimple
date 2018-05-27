@@ -9,9 +9,13 @@
     <AssemblyTitle>Statesimple</AssemblyTitle>
     <Copyright>Copyright © 2018 Statesimple.com. All rights reserved.</Copyright>
     <Product>Statesimple</Product>
-    <Version>0.1.0</Version>
+    <Version>0.1.1</Version>
     <GenerateAssemblyInfo>true</GenerateAssemblyInfo>
     <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
+    <PackageProjectUrl>https://github.com/gnxi/Statesimple</PackageProjectUrl>
+    <PackageLicenseUrl>http://www.apache.org/licenses/LICENSE-2.0</PackageLicenseUrl>
+    <PackageReleaseNotes></PackageReleaseNotes>
+    <Description>Use Statesimple to easily build state machines in .Net code using the latest language features.</Description>
   </PropertyGroup>
 
 </Project>
