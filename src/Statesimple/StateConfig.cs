@@ -18,7 +18,6 @@ namespace Statesimple
         }
         static Func<bool> _defaultGuard = () => true;
         readonly STATE _state;
-        readonly bool _throwOnError;
         readonly List<EventConfiguration> _stateTransitions = new List<EventConfiguration>();
         readonly List<IStateEvent<EVENT>> _entries = new List<IStateEvent<EVENT>>();
         Func<Task> _onEnterAsync;
@@ -27,9 +26,8 @@ namespace Statesimple
         Func<Task> _onDeactivateAsync;
         public object SuperState { get; private set; }
         public IEnumerable<EVENT> PermittedEvents => _stateTransitions.Select(x=>x.Evt);
-        public StateConfiguration(STATE state, bool throwOnError = false)
+        public StateConfiguration(STATE state)
         {
-            _throwOnError = throwOnError;
             _state = state;
         }
         public StateConfiguration<STATE, EVENT> SubstateOf(STATE superState)
@@ -133,17 +131,11 @@ namespace Statesimple
             _stateTransitions.Add(new EventConfiguration { Evt = evt, Ignore = true });
             return this;
         }
-        public StateConfiguration<STATE, EVENT> OnEvent(EVENT evt)
-        {
-            return EventTransitionTo(evt, _state);
-        }
-
         internal async Task HandleActivateAsync()
         {
             if (_onActivateAsync != null)
                 await _onActivateAsync();
         }
-
         internal async Task HandleDeactivateAsync()
         {
             if (_onDeactivateAsync != null)

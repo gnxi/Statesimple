@@ -1,6 +1,7 @@
 ﻿// Copyright (c) Statesimple.com. All rights reserved.
 // Licensed under the Apache License, Version 2.0. See License.txt in the project root for license information.
 using System;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 
@@ -11,7 +12,7 @@ namespace Statesimple
         readonly Func<Task<STATE>> _loadStateAsync;
         readonly Func<STATE, Task> _saveStateAsync;
         readonly Dictionary<STATE, StateConfiguration<STATE, EVENT>> _states = new Dictionary<STATE, StateConfiguration<STATE, EVENT>>();
-        readonly List<Func<Task>> _taskList = new List<Func<Task>>();
+        readonly ConcurrentQueue<Func<Task>> _taskList = new ConcurrentQueue<Func<Task>>();
         List<Func<STATE, STATE, EVENT, object[], Task>> _transitionCallbacks;
         Func<EVENT,STATE, Task> _onUnhandledEvent;
         public StateMachine(STATE state) :this(() => state, (newState) => state = newState)
@@ -66,19 +67,24 @@ namespace Statesimple
         }
         public async Task TriggerEventAsync(EVENT evt, params object[] parameters)
         {
-            _taskList.Add(() => ProcessEventCoreAsync(evt, parameters));
-            if (_taskList.Count > 1)
-                return;
+            lock (_taskList)
+            {
+                _taskList.Enqueue(() => ProcessEventCoreAsync(evt, parameters));
+                if (_taskList.Count > 1)
+                    return;
+            }
 
-            while (_taskList.Count > 0)
+            Func<Task> func;
+
+            while (_taskList.TryPeek(out func))
             {
                 try
                 {
-                    await _taskList[0]();
+                    await func();
                 }
                 finally
                 {
-                    _taskList.RemoveAt(0);
+                    _taskList.TryDequeue(out _);
                 }
             }
         }

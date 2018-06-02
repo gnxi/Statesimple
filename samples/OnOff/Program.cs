@@ -11,27 +11,18 @@ namespace onoff
         static async Task Main()
         {
             string on = "On", off = "Off";
-            char space = ' ';
 
             var machine = new StateMachine<string, char>(off);
 
-            machine.Configure(off).EventTransitionTo(space, on);
-            machine.Configure(on).EventTransitionTo(space, off);
-            machine.OnUnhandledEvent((state, evt) => throw new Exception($"Cannot handle '{evt}' in state '{state}"));
+            machine.Configure(off).EventTransitionTo(' ', on).OnEnter(() => Console.WriteLine("State is on"));
+            machine.Configure(on).EventTransitionTo(' ', off).OnEnter(() => Console.WriteLine("State is off"));
+            machine.OnUnhandledEvent((state, evt) => {});
 
             Console.WriteLine("Press <space> to toggle the switch and q to quit.");
 
             for(char c = Console.ReadKey(true).KeyChar; c != 'q'; c = Console.ReadKey(true).KeyChar)
             {
-                try
-                {
-                    await machine.TriggerEventAsync(c);
-                    Console.WriteLine("State is " + machine.State);
-                }
-                catch (Exception ex)
-                {
-                    Console.WriteLine("Exception: " + ex.Message);
-                }
+                await machine.TriggerEventAsync(c);
             }
         }
     }
