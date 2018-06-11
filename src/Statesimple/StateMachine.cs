@@ -48,6 +48,10 @@ namespace Statesimple
             return IsSuperStateOf(state, State);
         }
         public IEnumerable<EVENT> PermittedTriggers => _states[State].PermittedEvents;
+        public void IgnoreUnhandledEvent()
+        {
+            _onUnhandledEvent = (a,s) => Task.CompletedTask;
+        }
         public void OnUnhandledEvent(Func<EVENT, STATE, Task> func)
         {
             _onUnhandledEvent = func;
