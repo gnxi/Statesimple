@@ -27,39 +27,39 @@ namespace Statesimple.test
                 .EventTransitionTo(Event.Prev, State.State2)
             ;
 
-            await machine.TriggerEventAsync(Event.Next);
+            await machine.ProcessEventAsync(Event.Next);
             Assert.Equal(State.State2, state);
             Assert.False(machine.IsInState(State.State3));
             Assert.True(machine.IsInState(State.State2));
             Assert.False(machine.IsInState(State.State3));
 
-            await machine.TriggerEventAsync(Event.Next);
+            await machine.ProcessEventAsync(Event.Next);
             Assert.Equal(State.State3, state);
             Assert.True(machine.IsInState(State.State3));
 
-            await machine.TriggerEventAsync(Event.Prev);
+            await machine.ProcessEventAsync(Event.Prev);
             Assert.Equal(State.State2, state);
             Assert.True(machine.IsInState(State.State2));
 
-            await machine.TriggerEventAsync(Event.Next);
+            await machine.ProcessEventAsync(Event.Next);
             Assert.Equal(State.State3, state);
             Assert.True(machine.IsInState(State.State3));
 
-            await machine.TriggerEventAsync(Event.Next);
+            await machine.ProcessEventAsync(Event.Next);
             // ignored
             Assert.Equal(State.State3, state);
             Assert.True(machine.IsInState(State.State3));
 
-            await machine.TriggerEventAsync(Event.Next);
+            await machine.ProcessEventAsync(Event.Next);
             // ignored
             Assert.Equal(State.State3, state);
             Assert.True(machine.IsInState(State.State3));
 
-            await machine.TriggerEventAsync(Event.Prev);
+            await machine.ProcessEventAsync(Event.Prev);
             Assert.Equal(State.State2, state);
             Assert.True(machine.IsInState(State.State2));
 
-            await machine.TriggerEventAsync(Event.Prev);
+            await machine.ProcessEventAsync(Event.Prev);
             Assert.Equal(State.State1, state);
             Assert.True(machine.IsInState(State.State1));
         }
@@ -90,25 +90,25 @@ namespace Statesimple.test
                 .EventTransitionTo(Event.Prev, State.State2)
             ;
 
-            await machine.TriggerEventAsync(Event.Next);
+            await machine.ProcessEventAsync(Event.Next);
             Assert.Equal(State.State2, state);
             Assert.False(machine.IsInState(State.State1));
             Assert.False(machine.IsInState(State.State2_Substate2));
             Assert.False(machine.IsInState(State.State2_Substate1));
 
-            await machine.TriggerEventAsync(Event.FirstSubstate);
+            await machine.ProcessEventAsync(Event.FirstSubstate);
             Assert.Equal(State.State2_Substate1, state);
             Assert.True(machine.IsInState(State.State2_Substate1));
             Assert.False(machine.IsInState(State.State2_Substate2));
             Assert.True(machine.IsInState(State.State2));
 
-            await machine.TriggerEventAsync(Event.NextSubstate);
+            await machine.ProcessEventAsync(Event.NextSubstate);
             Assert.Equal(State.State2_Substate2, state);
             Assert.True(machine.IsInState(State.State2_Substate2));
             Assert.False(machine.IsInState(State.State2_Substate1));
             Assert.True(machine.IsInState(State.State2));
 
-            await machine.TriggerEventAsync(Event.Next);
+            await machine.ProcessEventAsync(Event.Next);
             Assert.Equal(State.State3, state);
             Assert.False(machine.IsInState(State.State2_Substate2));
             Assert.False(machine.IsInState(State.State2_Substate1));
@@ -123,8 +123,8 @@ namespace Statesimple.test
             machine.Configure(State.State1)
                 .OnEnter(Event.Timeout, async () => 
                 {
-                    await machine.TriggerEventAsync(Event.Next);
-                    await machine.TriggerEventAsync(Event.Next);
+                    await machine.ProcessEventAsync(Event.Next);
+                    await machine.ProcessEventAsync(Event.Next);
                 })
                 .EventTransitionToSelf(Event.Timeout)
                 .EventTransitionTo(Event.Next, State.State2)
@@ -137,7 +137,7 @@ namespace Statesimple.test
                 .EventTransitionTo(Event.Prev, State.State2)
             ;
 
-            await machine.TriggerEventAsync(Event.Timeout);
+            await machine.ProcessEventAsync(Event.Timeout);
             Assert.True(machine.IsInState(State.State3));
         }
         [Fact]
@@ -157,11 +157,11 @@ namespace Statesimple.test
                 .EventTransitionToSelf(Event.Next)
             ;
 
-            await machine.TriggerEventAsync(Event.Next);
+            await machine.ProcessEventAsync(Event.Next);
             Assert.NotEqual("hello", p1);
             Assert.True(machine.IsInState(State.State2));
 
-            await machine.TriggerEventAsync(Event.Next, "hello");
+            await machine.ProcessEventAsync(Event.Next, "hello");
             Assert.Equal("hello", p1);
             Assert.True(machine.IsInState(State.State2));
         }

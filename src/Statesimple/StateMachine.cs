@@ -14,7 +14,8 @@ namespace Statesimple
         readonly Dictionary<STATE, StateConfiguration<STATE, EVENT>> _states = new Dictionary<STATE, StateConfiguration<STATE, EVENT>>();
         readonly ConcurrentQueue<Func<Task>> _taskList = new ConcurrentQueue<Func<Task>>();
         List<Func<STATE, STATE, EVENT, object[], Task>> _transitionCallbacks;
-        Func<EVENT,STATE, Task> _onUnhandledEvent;
+        Func<Task> _onIntializeAsync = () => Task.CompletedTask;
+        Func<EVENT,STATE, Task> _onUnhandledEventAsync;
         public StateMachine(STATE state) :this(() => state, (newState) => state = newState)
         {
         }
@@ -50,15 +51,23 @@ namespace Statesimple
         public IEnumerable<EVENT> PermittedTriggers => _states[State].PermittedEvents;
         public void IgnoreUnhandledEvent()
         {
-            _onUnhandledEvent = (a,s) => Task.CompletedTask;
+            _onUnhandledEventAsync = (a, s) => Task.CompletedTask;
         }
         public void OnUnhandledEvent(Func<EVENT, STATE, Task> func)
         {
-            _onUnhandledEvent = func;
+            _onUnhandledEventAsync = func;
         }
         public void OnUnhandledEvent(Action<EVENT, STATE> action)
         {
             OnUnhandledEvent((evt,state) => { action(evt, state); return Task.CompletedTask; });
+        }
+        public void OnInitialize(Func<Task> func)
+        {
+            _onIntializeAsync = func;
+        }
+        public void OnInitialize(Action action)
+        {
+            OnInitialize(() => { action(); return Task.CompletedTask; });
         }
         public StateConfiguration<STATE, EVENT> Configure(STATE state)
         {
@@ -69,7 +78,7 @@ namespace Statesimple
             _states.Add(state, stateConfiguration);
             return stateConfiguration;
         }
-        public async Task TriggerEventAsync(EVENT evt, params object[] parameters)
+        public async Task ProcessEventAsync(EVENT evt, params object[] parameters)
         {
             lock (_taskList)
             {
@@ -135,9 +144,9 @@ namespace Statesimple
             }
             catch (Exception e) when (e.Message == "unhandled")
             {
-                if (_onUnhandledEvent == null)
+                if (_onUnhandledEventAsync == null)
                     throw;
-                await _onUnhandledEvent(evt, currentState);
+                await _onUnhandledEventAsync(evt, currentState);
                 return;
             }
             catch (Exception e) when (e.Message == "ignore")
