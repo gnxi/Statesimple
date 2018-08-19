@@ -22,7 +22,7 @@ namespace onoff
 
             for(char c = Console.ReadKey(true).KeyChar; c != 'q'; c = Console.ReadKey(true).KeyChar)
             {
-                await machine.TriggerEventAsync(c);
+                await machine.ProcessEventAsync(c);
             }
         }
     }
