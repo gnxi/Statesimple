@@ -7,9 +7,9 @@
     <AssemblyOriginatorKeyFile>statesimple.snk</AssemblyOriginatorKeyFile>
     <DelaySign>false</DelaySign>
     <AssemblyTitle>Statesimple</AssemblyTitle>
-    <Copyright>Copyright © 2018 Statesimple.com. All rights reserved.</Copyright>
+    <Copyright>Copyright © 2018-2019 Statesimple.com. All rights reserved.</Copyright>
     <Product>Statesimple</Product>
-    <Version>0.3.0</Version>
+    <Version>0.4.0</Version>
     <GenerateAssemblyInfo>true</GenerateAssemblyInfo>
     <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
     <PackageProjectUrl>https://github.com/gnxi/Statesimple</PackageProjectUrl>

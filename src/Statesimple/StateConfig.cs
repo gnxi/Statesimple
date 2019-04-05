@@ -147,15 +147,25 @@ namespace Statesimple
             if (_onExitAsync != null)
                 await _onExitAsync();
         }
-        internal async Task HandleEventAsync(EVENT evt, object[] parameters)
+        internal Func<Task> GetMatchingHandler(EVENT evt, object[] inParameters, Func<Type, object, object> typeConverter = null)
         {
-            IStateEvent<EVENT> stateEvent = _entries.FirstOrDefault(x => x.IsMatch(evt, parameters));
+            if (_entries.Count == 0)
+                return null;
+            object[] outParameters = null;
+            IStateEvent<EVENT> stateEvent = _entries.FirstOrDefault(x => x.IsMatch(evt, inParameters, out outParameters, typeConverter));
             if (stateEvent != null)
-                await stateEvent.ProcessAsync(parameters);
-            else if (_onEnterAsync != null)
-                await _onEnterAsync();
+                return () => stateEvent.ProcessAsync(outParameters);
+            return null;
         }
-        internal STATE GetNextState(EVENT evt)
+        internal Func<Task> GetDefaultHandler()
+        {
+            if (_onEnterAsync != null)
+                return _onEnterAsync;
+            else if(_entries.Count == 0)
+                return () => Task.CompletedTask;
+            return null;
+        }
+        internal STATE[] GetNextStates(EVENT evt)
         {
             IEnumerable<EventConfiguration> transitions = _stateTransitions
                 .Where(x => EqualityComparer<EVENT>.Default.Equals(x.Evt, evt));
@@ -163,14 +173,15 @@ namespace Statesimple
             if (!transitions.Any())
                 throw new NotSupportedException($"Transitions from {_state} using {evt} is not defined");
 
-            EventConfiguration transition = transitions.FirstOrDefault(x => x.Guard());
-            if(transition == null)
+            transitions = transitions.Where(x => x.Guard());
+            if(!transitions.Any())
                 throw new Exception("guarded");
 
-            if (transition.Ignore)
+            transitions = transitions.Where(x => !x.Ignore);
+            if (!transitions.Any())
                 throw new Exception("ignore");
 
-            return transition.State;
+            return transitions.Select(x=>x.State).ToArray();
         }
     }
 }

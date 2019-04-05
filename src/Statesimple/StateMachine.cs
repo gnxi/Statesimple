@@ -16,6 +16,7 @@ namespace Statesimple
         List<Func<STATE, STATE, EVENT, object[], Task>> _transitionCallbacks;
         Func<Task> _onIntializeAsync = () => Task.CompletedTask;
         Func<EVENT,STATE, Task> _onUnhandledEventAsync;
+        Func<Type, object, object> _typeConverter;
         public StateMachine(STATE state) :this(() => state, (newState) => state = newState)
         {
         }
@@ -26,11 +27,6 @@ namespace Statesimple
         }
         public StateMachine(Func<STATE> loadState, Action<STATE> saveState) : this(() => { return Task.FromResult(loadState()); }, (state) => { saveState(state); return Task.CompletedTask; }) { }
         public STATE State => _loadStateAsync().Result;
-        public bool CanHandleEvent(EVENT evt)
-        {
-            // update to hande superstate
-            return _states[State].GetNextState(evt) != null;
-        }
         public bool IsSuperStateOf(STATE superState, STATE subState)
         {
             object state = _states[subState].SuperState;
@@ -52,6 +48,10 @@ namespace Statesimple
         public void IgnoreUnhandledEvent()
         {
             _onUnhandledEventAsync = (a, s) => Task.CompletedTask;
+        }
+        public void OnTypeConversion(Func<Type, object, object> typeConverter)
+        {
+            _typeConverter = typeConverter;
         }
         public void OnUnhandledEvent(Func<EVENT, STATE, Task> func)
         {
@@ -101,7 +101,7 @@ namespace Statesimple
                 }
             }
         }
-        STATE GetNextState(STATE state, EVENT evt)
+        Func<Task> GetNextStateHandler(STATE currentState, EVENT evt, object[] parameter, out STATE nextState)
         {
             object superStateObject;
 
@@ -109,7 +109,19 @@ namespace Statesimple
             {
                 try
                 {
-                    return _states[state].GetNextState(evt);
+                    foreach(STATE state in _states[currentState].GetNextStates(evt))
+                    {
+                        Func<Task> handlerFunc = _states[state].GetMatchingHandler(evt, parameter);
+                        if(handlerFunc == null && parameter.Length > 0 && _typeConverter != null)
+                            handlerFunc = _states[state].GetMatchingHandler(evt, parameter, _typeConverter);
+                        if (handlerFunc == null)
+                            handlerFunc = _states[state].GetDefaultHandler();
+                        if (handlerFunc != null)
+                        {
+                            nextState = state;
+                            return handlerFunc;
+                        }
+                    }
                 }
                 catch (Exception e) when (e.Message == "guarded")
                 {
@@ -126,7 +138,7 @@ namespace Statesimple
                     continue;
                 }
             }
-            while ((superStateObject = _states[state].SuperState) != null && (state = (STATE)superStateObject) != null);
+            while ((superStateObject = _states[currentState].SuperState) != null && (currentState = (STATE)superStateObject) != null);
 
             throw new Exception("unhandled");
         }
@@ -137,10 +149,11 @@ namespace Statesimple
                 throw new NotSupportedException($"State {currentState} is not a valid state");
 
             STATE nextState;
+            Func<Task> handlerFunc = null;
 
             try
             {
-                nextState = GetNextState(currentState, evt);
+                handlerFunc = GetNextStateHandler(currentState, evt, parameters, out nextState);
             }
             catch (Exception e) when (e.Message == "unhandled")
             {
@@ -184,7 +197,7 @@ namespace Statesimple
 
             if (!nextStateIsSuperState)
             {
-                await _states[nextState].HandleEventAsync(evt, parameters);
+                await handlerFunc();
                 await _states[nextState].HandleDeactivateAsync();
             }
 

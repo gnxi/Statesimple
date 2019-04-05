@@ -141,29 +141,109 @@ namespace Statesimple.test
             Assert.True(machine.IsInState(State.State3));
         }
         [Fact]
+        public async Task EventWithoutParameters()
+        {
+            State state = State.State1;
+            var machine = new StateMachine<State, Event>(() => state, (s) => state = s);
+            machine.IgnoreUnhandledEvent();
+
+            string s1 = null;
+
+            machine.Configure(State.State1)
+                .OnEnter(() => s1 = "default")
+                .EventTransitionTo(Event.Prev, State.State1)
+                .EventTransitionTo(Event.Next, State.State2)
+            ;
+
+            machine.Configure(State.State2)
+                .OnEnter(Event.Next, () => s1 = "noparams")
+                .OnEnter<string>(Event.Next, (s) => s1 = s)
+                .EventTransitionToSelf(Event.Next)
+            ;
+
+            await machine.ProcessEventAsync(Event.Prev);
+            Assert.Equal("default", s1);
+            Assert.True(machine.IsInState(State.State1));
+
+            await machine.ProcessEventAsync(Event.Next);
+            Assert.Equal("noparams", s1);
+            Assert.True(machine.IsInState(State.State2));
+        }
+        [Fact]
         public async Task EventWithParameters()
         {
             State state = State.State1;
             var machine = new StateMachine<State, Event>(() => state, (s) => state = s);
+            machine.IgnoreUnhandledEvent();
 
-            string p1 = null;
+            string s1 = null;
 
             machine.Configure(State.State1)
                 .EventTransitionTo(Event.Next, State.State2)
             ;
 
             machine.Configure(State.State2)
-                .OnEnter<string>(Event.Next, (s) => p1 = s)
+                .OnEnter(Event.Next, () => s1 = "noparams")
+                .OnEnter<string>(Event.Next, (s) => s1 = s)
                 .EventTransitionToSelf(Event.Next)
             ;
 
             await machine.ProcessEventAsync(Event.Next);
-            Assert.NotEqual("hello", p1);
+            Assert.Equal("noparams", s1);
             Assert.True(machine.IsInState(State.State2));
 
             await machine.ProcessEventAsync(Event.Next, "hello");
-            Assert.Equal("hello", p1);
+            Assert.Equal("hello", s1);
             Assert.True(machine.IsInState(State.State2));
+        }
+        [Fact]
+        public async Task EventWithTypeConverter()
+        {
+            State state = State.State1;
+            var machine = new StateMachine<State, Event>(() => state, (s) => state = s);
+
+            machine.IgnoreUnhandledEvent();
+            machine.OnTypeConversion((type, obj) =>
+            {
+                if (type == typeof(string))
+                    return obj.ToString();
+                else if (type == typeof(int) && obj is string && int.TryParse((string)obj, out int value))
+                    return value;
+                return null;
+            });
+
+            string s1 = null;
+            int i1 = 0;
+
+            machine.Configure(State.State1)
+                .EventTransitionTo(Event.Next, State.State2)
+            ;
+
+            machine.Configure(State.State2)
+                .OnEnter<string>(Event.Next, (s) => s1 = s)
+                .OnEnter<int>(Event.Next, (i) => i1 = i)
+                .OnEnter<string,int>(Event.Next, (s, i) => { s1 = s; i1 = i; })
+                .EventTransitionToSelf(Event.Next)
+            ;
+
+            await machine.ProcessEventAsync(Event.Next);
+            Assert.NotEqual("hello", s1);
+            Assert.False(machine.IsInState(State.State2));
+
+            await machine.ProcessEventAsync(Event.Next, 10);
+            Assert.Equal(10, i1);
+            Assert.True(machine.IsInState(State.State2));
+
+            await machine.ProcessEventAsync(Event.Next, "world", 100);
+            Assert.Equal("world", s1);
+            Assert.Equal(100, i1);
+            Assert.True(machine.IsInState(State.State2));
+
+            await machine.ProcessEventAsync(Event.Next, 1000, "10000");
+            Assert.Equal("1000", s1);
+            Assert.Equal(10000, i1);
+            Assert.True(machine.IsInState(State.State2));
+
         }
     }
 }

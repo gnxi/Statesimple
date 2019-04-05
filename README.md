@@ -7,9 +7,9 @@
 Use Statesimple to easily build state machines in .Net 
 code using the latest language features.
 
-A first attempt to open source, only a few tests yet etc. Still very alpha...
+## Release notes v0.4.0
 
-Statesimple is original code but the concepts are inspired by [stateless](https://github.com/dotnet-state-machine/stateless)
+Added support for parameter type conversion.
 
 ## How to build a simple state machine
 
