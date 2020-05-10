@@ -7,6 +7,10 @@
 Use Statesimple to easily build state machines in .Net 
 code using the latest language features.
 
+## Release notes v0.5.0
+
+Performance improvement and bugfix.
+
 ## Release notes v0.4.0
 
 Added support for parameter type conversion.

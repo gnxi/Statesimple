@@ -149,12 +149,12 @@ namespace Statesimple
         }
         internal Func<Task> GetMatchingHandler(EVENT evt, object[] inParameters, Func<Type, object, object> typeConverter = null)
         {
-            if (_entries.Count == 0)
-                return null;
-            object[] outParameters = null;
-            IStateEvent<EVENT> stateEvent = _entries.FirstOrDefault(x => x.IsMatch(evt, inParameters, out outParameters, typeConverter));
-            if (stateEvent != null)
-                return () => stateEvent.ProcessAsync(outParameters);
+            foreach (var entry in _entries)
+            {
+                Func<Task> handlerFunc = entry.GetMatchingFunc(evt, inParameters, typeConverter);
+                if (handlerFunc != null)
+                    return handlerFunc;
+            }
             return null;
         }
         internal Func<Task> GetDefaultHandler()

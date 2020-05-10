@@ -177,6 +177,8 @@ namespace Statesimple.test
             machine.IgnoreUnhandledEvent();
 
             string s1 = null;
+            int i1 = 0;
+            string s2 = null;
 
             machine.Configure(State.State1)
                 .EventTransitionTo(Event.Next, State.State2)
@@ -185,6 +187,8 @@ namespace Statesimple.test
             machine.Configure(State.State2)
                 .OnEnter(Event.Next, () => s1 = "noparams")
                 .OnEnter<string>(Event.Next, (s) => s1 = s)
+                .OnEnter<string, int>(Event.Next, (s, i) => { s1 = s; i1 = i; })
+                .OnEnter<string, int, string>(Event.Next, (s, i, s3) => { s1 = s; i1 = i; s2 = s3; })
                 .EventTransitionToSelf(Event.Next)
             ;
 
@@ -194,6 +198,17 @@ namespace Statesimple.test
 
             await machine.ProcessEventAsync(Event.Next, "hello");
             Assert.Equal("hello", s1);
+            Assert.True(machine.IsInState(State.State2));
+
+            await machine.ProcessEventAsync(Event.Next, "world", 10);
+            Assert.Equal("world", s1);
+            Assert.Equal(10, i1);
+            Assert.True(machine.IsInState(State.State2));
+
+            await machine.ProcessEventAsync(Event.Next, "again", 20, "99");
+            Assert.Equal("again", s1);
+            Assert.Equal(20, i1);
+            Assert.Equal("99", s2);
             Assert.True(machine.IsInState(State.State2));
         }
         [Fact]
