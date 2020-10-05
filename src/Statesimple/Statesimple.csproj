@@ -1,21 +1,18 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
-
   <PropertyGroup>
-    <TargetFrameworks>netstandard2.0;net461</TargetFrameworks>
-    <LangVersion>latest</LangVersion>
+    <TargetFrameworks>netstandard2.0</TargetFrameworks>
     <SignAssembly>true</SignAssembly>
     <AssemblyOriginatorKeyFile>statesimple.snk</AssemblyOriginatorKeyFile>
     <DelaySign>false</DelaySign>
+
     <AssemblyTitle>Statesimple</AssemblyTitle>
     <Copyright>Copyright © 2018-2020 Statesimple.com. All rights reserved.</Copyright>
-    <Product>Statesimple</Product>
-    <Version>0.5.0</Version>
+
     <GenerateAssemblyInfo>true</GenerateAssemblyInfo>
     <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
     <PackageProjectUrl>https://github.com/gnxi/Statesimple</PackageProjectUrl>
-    <PackageLicenseUrl>http://www.apache.org/licenses/LICENSE-2.0</PackageLicenseUrl>
+    <PackageLicenseExpression>Apache-2.0</PackageLicenseExpression>
     <PackageReleaseNotes></PackageReleaseNotes>
     <Description>Use Statesimple to easily build state machines in .Net code using the latest language features.</Description>
   </PropertyGroup>
-
 </Project>

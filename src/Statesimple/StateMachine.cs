@@ -87,9 +87,7 @@ namespace Statesimple
                     return;
             }
 
-            Func<Task> func;
-
-            while (_taskList.TryPeek(out func))
+            while (_taskList.TryPeek(out Func<Task> func))
             {
                 try
                 {
@@ -207,12 +205,12 @@ namespace Statesimple
         }
         public void OnTransitioned(Action<STATE, STATE, EVENT, object[]> onTransitionAction)
         {
-            (_transitionCallbacks ?? (_transitionCallbacks = new List<Func<STATE, STATE, EVENT, object[], Task>>()))
+            (_transitionCallbacks ??= new List<Func<STATE, STATE, EVENT, object[], Task>>())
                 .Add((from, to, evt, parameters) => { onTransitionAction(from, to, evt, parameters); return Task.CompletedTask; });
         }
         public void OnTransitioned(Func<STATE, STATE, EVENT, object[], Task> onTransitionAction)
         {
-            (_transitionCallbacks ?? (_transitionCallbacks = new List<Func<STATE, STATE, EVENT, object[], Task>>()))
+            (_transitionCallbacks ??= new List<Func<STATE, STATE, EVENT, object[], Task>>())
                 .Add(onTransitionAction);
         }
     }

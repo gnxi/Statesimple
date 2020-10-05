@@ -141,7 +141,7 @@ namespace Statesimple
             if (_onDeactivateAsync != null)
                 await _onDeactivateAsync();
         }
-        internal bool HasOnExit { get { return _onExitAsync != null; } }
+        internal bool HasOnExit => _onExitAsync != null;
         internal async Task HandleExitAsync()
         {
             if (_onExitAsync != null)
@@ -161,7 +161,7 @@ namespace Statesimple
         {
             if (_onEnterAsync != null)
                 return _onEnterAsync;
-            else if(_entries.Count == 0)
+            if(_entries.Count == 0)
                 return () => Task.CompletedTask;
             return null;
         }

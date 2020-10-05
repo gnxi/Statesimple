@@ -1,0 +1,38 @@
+trigger:
+- master
+pool:
+  vmImage: 'ubuntu-latest'
+variables:
+  buildConfiguration: 'Release'
+steps:
+- task: DotNetCoreCLI@2
+  displayName: Restore
+  inputs:
+    command: 'restore'
+    projects: |
+      $(Build.SourcesDirectory)/src/**/*.csproj
+      $(Build.SourcesDirectory)/test/**/*.csproj
+    includeNuGetOrg: true
+- task: DotNetCoreCLI@2
+  displayName: Build
+  inputs:
+    command: 'build'
+    arguments: '--configuration $(BuildConfiguration)'
+    projects: |
+      $(Build.SourcesDirectory)/src/**/*.csproj
+      $(Build.SourcesDirectory)/test/**/*.csproj
+- task: DotNetCoreCLI@2
+  displayName: Test
+  inputs:
+    command: 'test'
+    arguments: '--configuration $(BuildConfiguration)'
+    projects: '$(Build.SourcesDirectory)/test/**/*.csproj'
+    publishTestResults: false
+    testRunTitle: 'Test'
+- task: NuGetCommand@2
+  displayName: NuGet Push
+  inputs:
+    command: 'push'
+    packagesToPush: '$(Build.SourcesDirectory)/src/**/*.nupkg'
+    nuGetFeedType: 'external'
+    publishFeedCredentials: 'nuget.org'

@@ -1,11 +1,17 @@
 # Statesimple
+<!-- 
 [![Build status](https://ci.appveyor.com/api/projects/status/github/gnxi/statesimple?svg=true)](https://ci.appveyor.com/project/gnxi/statesimple/branch/master) 
+-->
 [![NuGet Pre Release](https://img.shields.io/nuget/vpre/Statesimple.svg)](https://www.nuget.org/packages/statesimple)
 <!-- 
     [![Stack Overflow](https://img.shields.io/badge/stackoverflow-tag-orange.svg)](http://stackoverflow.com/questions/tagged/statesimple)
 -->
 Use Statesimple to easily build state machines in .Net 
 code using the latest language features.
+
+## Release notes v0.6.0
+
+Modernized build and code. Added PhoneCall sample
 
 ## Release notes v0.5.0
 
@@ -56,6 +62,8 @@ for(char c = Console.ReadKey(true).KeyChar; c != 'q'; c = Console.ReadKey(true).
 ```
 
 We now have a finished state machine.
+
+More samples [OnOff](https://github.com/gnxi/Statesimple/tree/master/samples/OnOff), [PhoneCall](https://github.com/gnxi/Statesimple/tree/master/samples/PhoneCall)
 
 ## Features
 
@@ -157,7 +165,7 @@ public StateConfiguration<STATE, EVENT> EventIgnore(EVENT evt);
 After the state machine is configured, it is ready to process events. Use `ProcessEventAsync`.
 
 ```csharp
-public async Task ProcessEventAsync(EVENT evt, params object[] parameters);
+public Task ProcessEventAsync(EVENT evt, params object[] parameters);
 ```
 
 `ProcessEventAsync` is thread safe and will queue events. 

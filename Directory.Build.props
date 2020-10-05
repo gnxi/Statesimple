@@ -1,0 +1,13 @@
+<Project>
+  <PropertyGroup>
+    <LangVersion>latest</LangVersion>
+    <Copyright>Copyright © 2018-2020 Statesimple.com. All rights reserved.</Copyright>
+    <Product>Statesimple</Product>
+
+    <Version>0.6.0-beta.1</Version>
+
+    <NeutralLanguage>en-US</NeutralLanguage>
+    <IncludeSymbols>true</IncludeSymbols>
+    <SymbolPackageFormat>snupkg</SymbolPackageFormat>
+  </PropertyGroup>
+</Project>
