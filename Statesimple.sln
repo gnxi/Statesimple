@@ -24,11 +24,18 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution 
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "samples", "samples", "{6F13EF84-2CB8-4C09-AEE3-061E4822FFF6}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "OnOff", "samples\onoff\OnOff.csproj", "{3F09C4C4-CFB3-4FCA-A66C-B546546C5570}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "OnOff", "samples\OnOff\OnOff.csproj", "{3F09C4C4-CFB3-4FCA-A66C-B546546C5570}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Statesimple.Tests", "test\Statesimple.Tests\Statesimple.Tests.csproj", "{442AFA9B-42B8-41CA-9416-E40F9947C26D}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "PhoneCall", "samples\PhoneCall\PhoneCall.csproj", "{D4E3BCB9-F334-4310-9749-FF68C1C7E06F}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = ".github", ".github", "{B7A6C1D0-CA98-47A2-938C-6C690D7D070A}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "workflows", "workflows", "{E9651062-F55A-4588-BC2B-9CA3D926D9E4}"
+	ProjectSection(SolutionItems) = preProject
+		.github\workflows\dotnet-core.yml = .github\workflows\dotnet-core.yml
+	EndProjectSection
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -63,6 +70,7 @@ Global
 		{3F09C4C4-CFB3-4FCA-A66C-B546546C5570} = {6F13EF84-2CB8-4C09-AEE3-061E4822FFF6}
 		{442AFA9B-42B8-41CA-9416-E40F9947C26D} = {1786E75D-F55B-41C8-A874-5C86973F1A54}
 		{D4E3BCB9-F334-4310-9749-FF68C1C7E06F} = {6F13EF84-2CB8-4C09-AEE3-061E4822FFF6}
+		{E9651062-F55A-4588-BC2B-9CA3D926D9E4} = {B7A6C1D0-CA98-47A2-938C-6C690D7D070A}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {15DD8938-BB0F-4C67-8427-E0CD28CC7742}
